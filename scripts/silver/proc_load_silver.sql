@@ -20,9 +20,12 @@ Usage Example:
 
 CREATE OR ALTER PROCEDURE silver.load_silver AS
 BEGIN
+    SET NOCOUNT ON;
+    SET XACT_ABORT ON;
     DECLARE @start_time DATETIME, @end_time DATETIME, @batch_start_time DATETIME, @batch_end_time DATETIME; 
     BEGIN TRY
         SET @batch_start_time = GETDATE();
+        BEGIN TRANSACTION;
         PRINT '================================================';
         PRINT 'Loading Silver Layer';
         PRINT '================================================';
@@ -240,14 +243,19 @@ BEGIN
 		PRINT 'Loading Silver Layer is Completed';
         PRINT '   - Total Load Duration: ' + CAST(DATEDIFF(SECOND, @batch_start_time, @batch_end_time) AS NVARCHAR) + ' seconds';
 		PRINT '=========================================='
+
+        COMMIT TRANSACTION;
 		
 	END TRY
 	BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
 		PRINT '=========================================='
-		PRINT 'ERROR OCCURED DURING LOADING BRONZE LAYER'
-		PRINT 'Error Message' + ERROR_MESSAGE();
-		PRINT 'Error Message' + CAST (ERROR_NUMBER() AS NVARCHAR);
-		PRINT 'Error Message' + CAST (ERROR_STATE() AS NVARCHAR);
+		PRINT 'ERROR OCCURRED DURING LOADING SILVER LAYER'
+		PRINT 'Error Message: ' + ERROR_MESSAGE();
+		PRINT 'Error Number : ' + CAST (ERROR_NUMBER() AS NVARCHAR);
+		PRINT 'Error State  : ' + CAST (ERROR_STATE() AS NVARCHAR);
 		PRINT '=========================================='
+        THROW;
 	END CATCH
 END

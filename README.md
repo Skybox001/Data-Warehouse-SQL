@@ -1,88 +1,51 @@
 # 📊 Data Warehouse SQL Project
 
 ## 🚀 Overview
+This project implements an end-to-end SQL Server data warehouse using a Medallion-style architecture:
+- **bronze**: raw ingestion from CRM and ERP CSV sources
+- **silver**: cleansed and standardized data
+- **gold**: business-ready star schema views for analytics
 
-This project demonstrates the design and implementation of a **data warehouse using SQL**.
-The initial version of this project was developed independently, and later enhanced and completed by incorporating concepts and structure from an existing open-source project.
+## 🏗️ Architecture
+- **Bronze layer**: source-aligned tables loaded via `BULK INSERT`
+- **Silver layer**: transformation, deduplication, standardization, and data fixes
+- **Gold layer**: `dim_customers`, `dim_products`, and `fact_sales`
 
----
+## 📁 Project Structure
+- `scripts/init_database.sql` - creates database and schemas
+- `scripts/bronze/ddl_bronze.sql` - bronze table DDL
+- `scripts/bronze/proc_load_bronze.sql` - bronze load procedure (configurable source root)
+- `scripts/silver/ddl_silver.sql` - silver table DDL
+- `scripts/silver/proc_load_silver.sql` - silver load procedure
+- `scripts/silver/indexes_silver.sql` - performance indexes for analytical joins
+- `scripts/gold/ddl_gold.sql` - gold dimensional/fact views
+- `scripts/proc_load_datawarehouse.sql` - orchestration procedure for full load
+- `tests/quality_checks_silver.sql` - silver quality checks
+- `tests/quality_checks_gold.sql` - gold quality checks
 
-## 🧠 My Contribution
+## ▶️ Quick Start
+1. Run `scripts/init_database.sql`
+2. Run:
+   - `scripts/bronze/ddl_bronze.sql`
+   - `scripts/silver/ddl_silver.sql`
+   - `scripts/gold/ddl_gold.sql`
+3. Run the full pipeline:
+   - `scripts/proc_load_datawarehouse.sql` (create procedure)
+   - `EXEC dbo.load_datawarehouse;`
+4. Optional:
+   - Use custom source path:  
+     `EXEC dbo.load_datawarehouse @source_root = 'D:\datasets';`
+   - Run index script: `scripts/silver/indexes_silver.sql`
+5. Validate outputs with:
+   - `tests/quality_checks_silver.sql`
+   - `tests/quality_checks_gold.sql`
 
-* Designed the initial structure and schema of the data warehouse
-* Implemented core SQL queries and transformations
-* Extended the project by integrating advanced concepts from a reference implementation
-* Improved overall organization, query efficiency, and documentation
-
----
-
-## 🏗️ Project Architecture
-
-The project follows a layered data warehouse approach:
-
-* **Raw Layer** – Source data
-* **Staging Layer** – Data cleaning and transformation
-* **Warehouse Layer** – Structured tables for analysis
-
----
-
-## 🛠️ Technologies Used
-
-* SQL
-* Relational Database (MySQL / PostgreSQL / SQL Server)
-* Data Modeling (Star Schema / Snowflake Schema)
-
----
-
-## 📌 Features
-
-* Data ingestion and transformation pipelines
-* Optimized SQL queries for analytics
-* Structured schema design
-* Scalable and modular architecture
-
----
-
-## 📈 Use Cases
-
-* Business intelligence and reporting
-* Data analysis and insights generation
-* Query optimization for large datasets
-
----
-
-## 🔧 Enhancements & Improvements
-
-* Refined schema design for better performance
-* Added/modified SQL queries
-* Improved data transformation workflow
-* Enhanced documentation
-
----
-
-## ▶️ How to Run
-
-1. Clone the repository
-2. Load dataset into your database
-3. Execute SQL scripts in sequence
-4. Run analytical queries
-
----
+## ✅ Recent Improvements
+- Added configurable source root path for Bronze loading
+- Added full-load orchestration procedure (`dbo.load_datawarehouse`)
+- Added transaction-safe Silver load behavior with rollback on error
+- Added Silver-layer indexing script for faster joins and reporting queries
 
 ## 🙌 Acknowledgement
-
-This project was partially inspired and enhanced using the following open-source repository:
+This project was inspired by:
 https://github.com/DataWithBaraa/sql-data-warehouse-project
-
----
-
-## 👤 Author
-
-**Your Name**
-GitHub: https://github.com/Skybox001
-
----
-
-## 📬 Contact
-
-Feel free to reach out for collaboration or feedback.
